@@ -44,10 +44,10 @@ function ClimateCO2Link() {
       />
 
       {/* Big number with Granger summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginBottom: 56, position: 'relative', zIndex: 2 }}>
+      <div data-presenter="link-kpis" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, marginBottom: 56, position: 'relative', zIndex: 2 }}>
         <div className="glass" style={{ padding: '36px 40px' }}>
           <div className="mono" style={{ fontSize: 13, letterSpacing: '0.16em', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-            Granger global — lag 6 mois
+            <GlossaryTerm term="Granger">Granger</GlossaryTerm> global — lag 6 mois
           </div>
           <div style={{ marginTop: 18, display: 'flex', alignItems: 'baseline', gap: 16 }}>
             <span className="display tabular" style={{ fontSize: 140, lineHeight: 0.9, color: 'var(--green)', letterSpacing: '-0.04em' }}>
@@ -68,10 +68,10 @@ function ClimateCO2Link() {
 
         <div className="glass" style={{ padding: '36px 40px' }}>
           <div className="mono" style={{ fontSize: 13, letterSpacing: '0.16em', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-            Modèle multivarié sur résidus
+            Modèle multivarié sur <GlossaryTerm term="résidus">résidus</GlossaryTerm>
           </div>
           <div style={{ marginTop: 18, display: 'flex', alignItems: 'baseline', gap: 16 }}>
-            <span className="display tabular" style={{ fontSize: 100, lineHeight: 0.9, color: 'var(--hot1)', letterSpacing: '-0.04em' }}>R²=<CountUp value={0.748} decimals={3} duration={1800} /></span>
+            <span className="display tabular" style={{ fontSize: 100, lineHeight: 0.9, color: 'var(--hot1)', letterSpacing: '-0.04em' }}><GlossaryTerm term="R²">R²</GlossaryTerm>=<CountUp value={0.748} decimals={3} duration={1800} /></span>
           </div>
           <div style={{ marginTop: 12, fontSize: 17, color: 'var(--text-dim)' }}>
             12 variables climatiques résiduelles expliquent <strong className="text-hot">~75%</strong> du
@@ -93,7 +93,7 @@ function ClimateCO2Link() {
       </div>
 
       {/* Heatmap + repr selector */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 32, marginBottom: 56, position: 'relative', zIndex: 2, alignItems: 'start' }}>
+      <div data-presenter="link-heatmap" style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 32, marginBottom: 56, position: 'relative', zIndex: 2, alignItems: 'start' }}>
         <div className="glass" style={{ padding: 24, overflow: 'hidden' }}>
           <div className="hstack" style={{ justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
@@ -129,7 +129,7 @@ function ClimateCO2Link() {
       </div>
 
       {/* Sankey */}
-      <div className="glass" style={{ padding: 28, position: 'relative', zIndex: 2 }}>
+      <div className="glass" data-presenter="link-sankey" style={{ padding: 28, position: 'relative', zIndex: 2 }}>
         <div className="hstack" style={{ justifyContent: 'space-between', marginBottom: 14 }}>
           <div>
             <div className="mono" style={{ fontSize: 13, color: 'var(--text-dim)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Causalité de Granger · global · lag 6 mois</div>

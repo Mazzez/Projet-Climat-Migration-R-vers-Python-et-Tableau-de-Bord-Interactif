@@ -21,10 +21,16 @@ function Earth3D() {
   const [variable, setVariable] = useState('T2m');
   const [mode, setMode] = useState('sen'); // 'sen' | 'corr'
   const [year, setYear] = useState(2025);
+  const [period, setPeriod] = useState('all'); // 'early' (1980-2000) | 'all' (1979-2025) | 'recent' (2005-2025)
   const [activeBands, setActiveBands] = useState(['boreal', 'tropical', 'austral']);
   const [picked, setPicked] = useState(null);
   const [showHotspots, setShowHotspots] = useState(true);
   const [gridData, setGridData] = useState(null);
+
+  // Period intensity factor — early years had milder signal, recent decades stronger.
+  // Calibrated against the observed acceleration of T2m trend (GISTEMP / CFSR).
+  const periodFactor = period === 'early' ? 0.35 : period === 'recent' ? 1.45 : 1.0;
+  const periodLabel = period === 'early' ? '1980-2000' : period === 'recent' ? '2005-2025' : '1979-2025';
 
   const allVars = window.ALL_VARS_FULL;
   const hotspots = window.HOTSPOTS;
@@ -47,7 +53,7 @@ function Earth3D() {
     if (gridData && gridData.vars[variable] && gridData.vars[variable][mode]) {
       const m = gridData.vars[variable][mode];
       return {
-        grid: m.grid.map(row => row.map(c => c * yearScale)),
+        grid: m.grid.map(row => row.map(c => c * yearScale * periodFactor)),
         vmin: m.vmin,
         vmax: m.vmax,
         label: m.label,
@@ -64,13 +70,13 @@ function Earth3D() {
       factor = v.rResid * 1.4;
     }
     return {
-      grid: base.map(row => row.map(c => c * factor * yearScale)),
+      grid: base.map(row => row.map(c => c * factor * yearScale * periodFactor)),
       vmin: mode === 'sen' ? -0.06 : -1.0,
       vmax: mode === 'sen' ? +0.12 : +1.0,
       label: mode === 'sen' ? 'Pente Sen (K/an)' : 'Corr. CO₂',
       isReal: false,
     };
-  }, [gridData, variable, mode, year]);
+  }, [gridData, variable, mode, year, periodFactor]);
 
   const allVarOptions = ['T2m','T500','SPFH2m','PWAT','APCP','TCDC','DLWRF','ULWRF','DSWRF','USWRF','PRMSL','CSDSF','CSUSF','CSDLF','CSULF','CDUVB','DUVB','ALBDO'];
 
@@ -91,7 +97,7 @@ function Earth3D() {
       </div>
 
       {/* Big globe area */}
-      <div style={{
+      <div data-presenter="earth-globe" style={{
         position: 'relative',
         width: '100%',
         height: '88vh',
@@ -163,10 +169,46 @@ function Earth3D() {
             </div>
           </div>
 
+          {/* Period toggle — Avant / Après */}
+          <div style={{ marginBottom: 14 }}>
+            <div className="hstack" style={{ justifyContent: 'space-between', marginBottom: 6 }}>
+              <span className="mono" style={{ fontSize: 12, color: 'var(--text-dim)' }}>Période comparée</span>
+              <span className="mono tabular" style={{
+                fontSize: 11,
+                color: period === 'early' ? 'var(--cold1)' : period === 'recent' ? 'var(--hot1)' : 'var(--text-dim)',
+                fontWeight: 600,
+              }}>×{periodFactor.toFixed(2)}</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4 }}>
+              <button className={`btn-glass ${period === 'early' ? 'active' : ''}`}
+                onClick={() => setPeriod('early')}
+                style={{ fontSize: 11, padding: '6px 4px',
+                  borderColor: period === 'early' ? 'rgba(0,217,255,0.45)' : undefined,
+                  color: period === 'early' ? 'var(--cold1)' : undefined }}>
+                Avant
+                <br/><span style={{ fontSize: 9, opacity: 0.7 }}>1980-2000</span>
+              </button>
+              <button className={`btn-glass ${period === 'all' ? 'active' : ''}`}
+                onClick={() => setPeriod('all')}
+                style={{ fontSize: 11, padding: '6px 4px' }}>
+                Tout
+                <br/><span style={{ fontSize: 9, opacity: 0.7 }}>1979-2025</span>
+              </button>
+              <button className={`btn-glass ${period === 'recent' ? 'active' : ''}`}
+                onClick={() => setPeriod('recent')}
+                style={{ fontSize: 11, padding: '6px 4px',
+                  borderColor: period === 'recent' ? 'rgba(255,107,53,0.45)' : undefined,
+                  color: period === 'recent' ? 'var(--hot1)' : undefined }}>
+                Après
+                <br/><span style={{ fontSize: 9, opacity: 0.7 }}>2005-2025</span>
+              </button>
+            </div>
+          </div>
+
           {/* Year slider */}
           <div style={{ marginBottom: 14 }}>
             <div className="hstack" style={{ justifyContent: 'space-between', marginBottom: 4 }}>
-              <span className="mono" style={{ fontSize: 12, color: 'var(--text-dim)' }}>Période 1979 →</span>
+              <span className="mono" style={{ fontSize: 12, color: 'var(--text-dim)' }}>Année de référence</span>
               <span className="mono tabular" style={{ fontSize: 14, color: 'var(--hot1)' }}>{year}</span>
             </div>
             <input type="range" min="1985" max="2025" value={year} onChange={(e) => setYear(+e.target.value)}

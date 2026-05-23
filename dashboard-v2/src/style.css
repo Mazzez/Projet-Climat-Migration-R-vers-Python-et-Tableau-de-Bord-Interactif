@@ -245,6 +245,34 @@ p { margin: 0; color: var(--text-dim); }
 .pill-bi { background: rgba(255,107,53,0.12); color: var(--hot1); }
 .pill-none { background: rgba(255,255,255,0.04); color: var(--text-dim); }
 
+/* Presenter mode — caption en coin + halo de focus
+   Caption (top-left) et contrôles (bottom-right) en coin → ne bloquent plus le
+   centre/bas de l'écran. Le presenter cible des ÉLÉMENTS précis (data-presenter)
+   au lieu de sections entières. */
+body.presenter-active .nav-dots,
+body.presenter-active .top-brand,
+body.presenter-active .about-fab {
+  opacity: 0.18;
+  pointer-events: none;
+  transition: opacity 360ms var(--ease-expo);
+}
+
+/* Halo de focus autour de l'élément actif de l'étape */
+.presenter-focus {
+  position: relative;
+  z-index: 5;
+  animation: presenter-focus-pulse 2800ms ease-in-out infinite;
+  transition: box-shadow 400ms var(--ease-expo);
+}
+@keyframes presenter-focus-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,53,0), 0 0 60px 10px rgba(255,107,53,0.08); }
+  50%      { box-shadow: 0 0 0 2px rgba(255,107,53,0.35), 0 0 80px 16px rgba(255,107,53,0.22); }
+}
+/* Subtle dimming for non-focused content during a step */
+body.presenter-active main {
+  transition: filter 400ms ease;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

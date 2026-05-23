@@ -17,7 +17,7 @@ function Hotspots() {
       />
 
       {/* Hotspot grid 2x2 */}
-      <div style={{
+      <div data-presenter="hotspots-cards" style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18,
         marginBottom: 56, position: 'relative', zIndex: 2,
       }}>
@@ -27,7 +27,7 @@ function Hotspots() {
       </div>
 
       {/* Amplification thermometer + R² radar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative', zIndex: 2 }}>
+      <div data-presenter="hotspots-amp" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, position: 'relative', zIndex: 2 }}>
         <div className="glass" style={{ padding: 28 }}>
           <div className="mono" style={{ fontSize: 13, color: 'var(--text-dim)', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 6 }}>
             Tendance T2m par bande de latitude

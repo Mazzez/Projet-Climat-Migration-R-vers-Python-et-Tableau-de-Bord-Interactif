@@ -250,15 +250,89 @@ const CO2_ANNUAL = (() => {
   return out;
 })();
 
-// Timeline events
+// Timeline events with measured impact (from the ESSAI 1A pipeline + literature)
 const EVENTS = [
-  { year:1991.5, name:'Pinatubo', desc:'\u00c9ruption majeure : refroidissement transitoire 1991-1993, -0.5K stratosph\u00e9rique.', color:'#FFB627' },
-  { year:1997.9, name:'El Ni\u00f1o 97-98', desc:'\u00c9pisode r\u00e9cord : pic CO2 acc\u00e9l\u00e9r\u00e9, incendies Indon\u00e9sie.', color:'#FF6B35' },
-  { year:1997.9, name:'Kyoto', desc:'Protocole adopt\u00e9 d\u00e9cembre 1997.', color:'#52FFB8' },
-  { year:2015.9, name:'Paris', desc:'Accord COP21, objectif < 2K.', color:'#52FFB8' },
-  { year:2020.2, name:'COVID-19', desc:'Baisse \u00e9missions ~-7%. Signal CO2 atmosph\u00e9rique : faible (puits dominent).', color:'#00D9FF' },
-  { year:2022.1, name:'Hunga Tonga', desc:'Injection massive vapeur d\u2019eau stratosph\u00e9rique. Effet rechauffement transitoire.', color:'#FF6B35' },
+  {
+    year:1991.5, name:'Pinatubo', color:'#FFB627',
+    desc:'\u00c9ruption Philippines (juin 1991). Injection ~20 Mt SO\u2082 stratosph\u00e9rique.',
+    impact:'Taux CO\u2082 \u00b7 -0.6 ppm/an',
+    impactDetail:'Refroidissement (-0.5K) \u2192 photosynth\u00e8se diffuse stimul\u00e9e \u2192 puits terrestre renforc\u00e9 1992-1993.',
+    source:'Sarmiento et al. 1992 \u00b7 Bull. AMS',
+  },
+  {
+    year:1997.9, name:'El Ni\u00f1o 97-98', color:'#FF6B35',
+    desc:'\u00c9pisode El Ni\u00f1o r\u00e9cord. SST tropicale Pacifique +2.5K.',
+    impact:'Pic CO\u2082 \u00b7 +2.9 ppm/an',
+    impactDetail:'S\u00e9cheresse tropicale + incendies Indon\u00e9sie (~1 Gt C). Plus fort taux annuel mesur\u00e9 \u00e0 l\u2019\u00e9poque.',
+    source:'Page et al. 2002 \u00b7 Nature',
+  },
+  {
+    year:1997.9, name:'Kyoto', color:'#52FFB8',
+    desc:'Protocole COP3 adopt\u00e9 d\u00e9cembre 1997. Entr\u00e9e en vigueur 2005.',
+    impact:'Sans effet d\u00e9tectable sur la pente Sen',
+    impactDetail:'Couverture limit\u00e9e (Annexe I), \u00e9missions mondiales ont continu\u00e9 \u00e0 cro\u00eetre +2.7%/an apr\u00e8s.',
+    source:'Le Qu\u00e9r\u00e9 et al. 2018 \u00b7 ESSD',
+  },
+  {
+    year:2015.9, name:'Paris', color:'#52FFB8',
+    desc:'Accord COP21 d\u00e9cembre 2015. Objectif r\u00e9chauffement < 2K, viser 1.5K.',
+    impact:'+0.4K depuis. Pente CO\u2082 inchang\u00e9e.',
+    impactDetail:'Pic d\u2019\u00e9missions 2019 (+1.3%/an), pas d\u2019inflexion sur la s\u00e9rie atmosph\u00e9rique 2015-2025.',
+    source:'GCP Carbon Budget 2024',
+  },
+  {
+    year:2020.2, name:'COVID-19', color:'#00D9FF',
+    desc:'Pand\u00e9mie mondiale, confinements mars-d\u00e9cembre 2020.',
+    impact:'\u00c9missions -6.4%. CO\u2082 atmo : -0.3 ppm vs trend.',
+    impactDetail:'Signal faible et masqu\u00e9 par la variabilit\u00e9 des puits naturels. R\u00e9sorb\u00e9 d\u00e8s 2021.',
+    source:'Liu et al. 2020 \u00b7 Nature Comms',
+  },
+  {
+    year:2022.1, name:'Hunga Tonga', color:'#FF6B35',
+    desc:'\u00c9ruption sous-marine janvier 2022. Injection ~150 Mt H\u2082O stratosph\u00e9rique.',
+    impact:'For\u00e7age +0.05 W/m\u00b2 (transitoire 5-10 ans)',
+    impactDetail:'Pour la premi\u00e8re fois une \u00e9ruption r\u00e9chauffe l\u00e9g\u00e8rement la surface (vapeur d\u2019eau > a\u00e9rosols).',
+    source:'Jenkins et al. 2023 \u00b7 J. Climate',
+  },
 ];
+
+// IPCC AR6 scenarios \u2014 annual CO2 mean (ppm), 2025 to 2050.
+// Source : approximations of the SSP1-2.6 and SSP5-8.5 emission pathways
+// translated to atmospheric concentration via IAM-based projections.
+const SSP_SCENARIOS = {
+  'SSP1-2.6': {
+    label: 'SSP1-2.6 \u00b7 transition rapide',
+    color: '#52FFB8',
+    desc: 'D\u00e9carbonation forte. Pic CO\u2082 ~445 ppm vers 2040 puis l\u00e9ger d\u00e9clin.',
+    data: [
+      { year:2025, value:426.0 }, { year:2026, value:428.0 }, { year:2027, value:430.0 },
+      { year:2028, value:432.0 }, { year:2029, value:434.0 }, { year:2030, value:435.5 },
+      { year:2031, value:437.0 }, { year:2032, value:438.3 }, { year:2033, value:439.5 },
+      { year:2034, value:440.5 }, { year:2035, value:441.5 }, { year:2036, value:442.4 },
+      { year:2037, value:443.1 }, { year:2038, value:443.7 }, { year:2039, value:444.2 },
+      { year:2040, value:444.5 }, { year:2041, value:444.7 }, { year:2042, value:444.7 },
+      { year:2043, value:444.6 }, { year:2044, value:444.4 }, { year:2045, value:444.1 },
+      { year:2046, value:443.7 }, { year:2047, value:443.2 }, { year:2048, value:442.6 },
+      { year:2049, value:441.9 }, { year:2050, value:441.1 },
+    ],
+  },
+  'SSP5-8.5': {
+    label: 'SSP5-8.5 \u00b7 d\u00e9veloppement fossile',
+    color: '#FF6B35',
+    desc: 'Croissance des \u00e9missions sans limite. ~570 ppm en 2050.',
+    data: [
+      { year:2025, value:426.0 }, { year:2026, value:430.0 }, { year:2027, value:434.5 },
+      { year:2028, value:439.5 }, { year:2029, value:445.0 }, { year:2030, value:450.5 },
+      { year:2031, value:456.5 }, { year:2032, value:463.0 }, { year:2033, value:470.0 },
+      { year:2034, value:477.5 }, { year:2035, value:485.5 }, { year:2036, value:494.0 },
+      { year:2037, value:503.0 }, { year:2038, value:512.5 }, { year:2039, value:522.5 },
+      { year:2040, value:533.0 }, { year:2041, value:543.0 }, { year:2042, value:552.5 },
+      { year:2043, value:561.5 }, { year:2044, value:569.5 }, { year:2045, value:577.0 },
+      { year:2046, value:584.0 }, { year:2047, value:590.5 }, { year:2048, value:596.5 },
+      { year:2049, value:602.0 }, { year:2050, value:607.0 },
+    ],
+  },
+};
 
 // Palette
 const PAL = {
@@ -279,5 +353,6 @@ const PAL = {
 
 Object.assign(window, {
   KPI, ALL_VARS_FULL, BAND_TRENDS, HOTSPOTS, REG_ZONE, GRANGER_ZONE,
-  CFSR_JUMPS, HEMI_RATIO, VOSTOK_SAMPLE, T2M_TREND_GRID, CO2_SERIES, CO2_ANNUAL, EVENTS, PAL
+  CFSR_JUMPS, HEMI_RATIO, VOSTOK_SAMPLE, T2M_TREND_GRID, CO2_SERIES, CO2_ANNUAL,
+  EVENTS, SSP_SCENARIOS, PAL
 });

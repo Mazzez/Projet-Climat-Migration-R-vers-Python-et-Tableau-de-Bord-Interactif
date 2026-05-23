@@ -154,7 +154,159 @@ function divergentColor(value, vmax = 0.1) {
   }
 }
 
+// Glossary — definitions for technical terms (jury non-spécialiste)
+const GLOSSARY = {
+  'Sen': {
+    title: 'Pente de Sen',
+    text: 'Estimateur non-paramétrique robuste de la pente d\'une série temporelle, basé sur la médiane de toutes les pentes entre paires de points. Insensible aux valeurs aberrantes — contrairement aux moindres carrés.',
+  },
+  'Granger': {
+    title: 'Causalité de Granger',
+    text: 'Test statistique : on dit que X "cause au sens de Granger" Y si les valeurs passées de X améliorent significativement la prédiction de Y au-delà de ses propres valeurs passées. Ce n\'est pas une preuve de mécanisme physique, mais d\'antériorité prédictive.',
+  },
+  'IC95': {
+    title: 'Intervalle de Confiance 95%',
+    text: 'Fourchette dans laquelle se situe la vraie valeur avec 95% de probabilité. Ici calculé par bootstrap (10 000 rééchantillonnages aléatoires de la série).',
+  },
+  'R²': {
+    title: 'Coefficient de détermination',
+    text: 'Fraction de la variance de la variable cible (CO₂ résiduel) expliquée par les variables prédictrices. 0 = aucun pouvoir explicatif, 1 = explication parfaite.',
+  },
+  'STL': {
+    title: 'Seasonal-Trend Loess',
+    text: 'Décomposition d\'une série temporelle en trois composantes : tendance lente, cycle saisonnier répétitif, résidus. Permet d\'isoler le signal interannuel.',
+  },
+  'Anomalie': {
+    title: 'Anomalie',
+    text: 'Déviation à la climatologie mensuelle (moyenne 1991-2020). Retire le cycle saisonnier pour révéler les variations interannuelles.',
+  },
+  'résidus': {
+    title: 'Résidus détendrés',
+    text: 'Ce qui reste d\'une série après avoir retiré la tendance linéaire ET le cycle saisonnier. C\'est le signal interannuel propre — le seul niveau auquel on peut tester un couplage causal sans confondre avec la dérive commune.',
+  },
+  'CRE': {
+    title: 'Cloud Radiative Effect',
+    text: 'Effet radiatif des nuages = différence entre rayonnement net "all-sky" et "clear-sky". CRE_LW (absorption infrarouge), CRE_SW (réflexion solaire), CRE_net = somme.',
+  },
+  'CSDLF': {
+    title: 'Clear-Sky Downward Longwave Flux',
+    text: 'Rayonnement infrarouge descendant en l\'absence de nuages. Signature directe de l\'effet de serre par les GES (CO₂, H₂O, CH₄…). Sa montée +7.84 W/m² sur 47 ans est LA preuve physique du forçage.',
+  },
+};
+
+function GlossaryTerm({ term, children }) {
+  const def = GLOSSARY[term];
+  const [open, setOpen] = useState(false);
+  if (!def) return <>{children}</>;
+  return (
+    <span
+      style={{
+        borderBottom: '1px dotted rgba(0,217,255,0.5)',
+        cursor: 'help',
+        position: 'relative',
+        display: 'inline-block',
+      }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+    >
+      {children}
+      {open && (
+        <span style={{
+          position: 'absolute', bottom: 'calc(100% + 8px)', left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(15,20,32,0.97)',
+          border: '1px solid rgba(0,217,255,0.4)',
+          borderRadius: 10,
+          padding: '14px 16px',
+          width: 320,
+          fontSize: 13,
+          color: 'var(--text)',
+          lineHeight: 1.55,
+          zIndex: 999,
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 400,
+          fontStyle: 'normal',
+          textTransform: 'none',
+          letterSpacing: 0,
+          textAlign: 'left',
+          boxShadow: '0 10px 36px rgba(0,0,0,0.5)',
+          pointerEvents: 'none',
+        }}>
+          <span className="mono" style={{
+            display: 'block',
+            fontSize: 10,
+            color: 'var(--cold1)',
+            letterSpacing: '0.16em',
+            marginBottom: 8,
+            textTransform: 'uppercase',
+            fontWeight: 600,
+          }}>{def.title}</span>
+          <span style={{ display: 'block', color: 'var(--text-dim)' }}>{def.text}</span>
+        </span>
+      )}
+    </span>
+  );
+}
+
+// ExportButton — capture a DOM node to PNG via html2canvas (lazy-loaded CDN)
+function ExportButton({ targetSelector, filename, label = 'Capturer', style = {} }) {
+  const [busy, setBusy] = useState(false);
+  const ensureLib = () => new Promise((resolve, reject) => {
+    if (window.html2canvas) return resolve(window.html2canvas);
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    s.onload = () => resolve(window.html2canvas);
+    s.onerror = () => reject(new Error('html2canvas load failed'));
+    document.head.appendChild(s);
+  });
+  const onClick = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const node = document.querySelector(targetSelector);
+      if (!node) throw new Error('cible introuvable');
+      const h2c = await ensureLib();
+      const canvas = await h2c(node, {
+        backgroundColor: '#0A0E1A',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        ignoreElements: (el) => el.classList && (el.classList.contains('export-ignore') || el.classList.contains('grain')),
+      });
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (filename || 'capture') + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (err) {
+      console.warn('[ExportButton]', err);
+      alert('Capture impossible : ' + err.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button onClick={onClick} className="btn-glass export-ignore" disabled={busy}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        fontSize: 12, padding: '6px 12px',
+        opacity: busy ? 0.6 : 1, cursor: busy ? 'wait' : 'pointer',
+        ...style,
+      }}>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1.5V10M8 10L4.5 6.5M8 10L11.5 6.5M2 11V13.5C2 14.05 2.45 14.5 3 14.5H13C13.55 14.5 14 14.05 14 13.5V11"
+              stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      {busy ? 'Capture…' : label}
+    </button>
+  );
+}
+
 Object.assign(window, {
   useInView, CountUp, Sparkline, KPIChip, MetricCard, SectionHeader, SensPill,
   easeOutExpo, easeOutCubic, divergentColor,
+  GLOSSARY, GlossaryTerm, ExportButton,
 });

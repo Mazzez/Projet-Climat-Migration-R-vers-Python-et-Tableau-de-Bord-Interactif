@@ -20,6 +20,7 @@ function App() {
   const [progress, setProgress] = useState(0);
   const [active, setActive] = useState(1);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [presenterOpen, setPresenterOpen] = useState(false);
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
 
   useEffect(() => {
@@ -85,6 +86,20 @@ function App() {
         <span className="mono" style={{ fontSize: 12, letterSpacing: '0.08em' }}>ℹ À propos</span>
       </button>
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
+
+      <PresenterButton onClick={() => setPresenterOpen(true)} />
+      <PresenterMode open={presenterOpen} onClose={() => setPresenterOpen(false)} />
+
+      {!presenterOpen && (
+        <div style={{ position: 'fixed', bottom: 24, left: 380, zIndex: 80 }}>
+          <ExportButton
+            targetSelector={`#sec-${active}`}
+            filename={`section-${active}-${(labels[active]||'').toLowerCase().replace(/\s+/g,'-')}`}
+            label={`Capturer · ${labels[active] || ''}`}
+            style={{ borderColor: 'rgba(82,255,184,0.35)', color: 'var(--green)' }}
+          />
+        </div>
+      )}
 
       <TweaksPanel>
         <TweakSection label="Globe · Hero" />

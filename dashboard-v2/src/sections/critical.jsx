@@ -18,7 +18,7 @@ function Critical() {
       />
 
       {/* CFSR jump timeline */}
-      <div className="glass" style={{ padding: 28, marginBottom: 32, position: 'relative', zIndex: 2 }}>
+      <div className="glass" data-presenter="critical-timeline" style={{ padding: 28, marginBottom: 32, position: 'relative', zIndex: 2 }}>
         <div className="hstack" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
           <div>
             <div className="mono" style={{ fontSize: 13, color: 'var(--text-dim)', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Discontinuité instrumentale</div>
