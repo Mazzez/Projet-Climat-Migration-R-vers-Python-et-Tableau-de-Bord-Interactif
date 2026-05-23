@@ -1,0 +1,33 @@
+# ===================== Core scientific stack =====================
+numpy>=1.26
+pandas>=2.2
+scipy>=1.13
+
+# ===================== NetCDF / climate data =====================
+xarray>=2024.2
+netCDF4>=1.6
+cftime>=1.6
+dask[array]>=2024.2
+
+# ===================== Stats / time series =======================
+statsmodels>=0.14
+pymannkendall>=1.4
+ruptures>=1.1
+scikit-learn>=1.4
+
+# ===================== Visualisation =============================
+matplotlib>=3.8
+seaborn>=0.13
+
+# ===================== Dashboard =================================
+dash>=2.16
+plotly>=5.20
+dash-bootstrap-components>=1.5
+
+# ===================== Geographic / maps =========================
+cartopy>=0.22
+
+# ===================== Utilities =================================
+tqdm>=4.66
+ipykernel>=6.29
+jupyter>=1.0
